@@ -21,6 +21,7 @@
     "transcripts"
   ],
   "files": [
+    "bin/",
     "CHANGELOG.md",
     "README.md",
     "CONTRIBUTING.md",
@@ -35,10 +36,10 @@
     "refresh.js"
   ],
   "bin": {
-    "codex-qmd-sessions": "./convert-sessions.js",
-    "codex-qmd-sessions-doctor": "./doctor.js",
-    "codex-qmd-sessions-hook": "./hook.js",
-    "codex-qmd-sessions-refresh": "./refresh.js"
+    "codex-qmd-sessions": "bin/codex-qmd-sessions",
+    "codex-qmd-sessions-doctor": "bin/codex-qmd-sessions-doctor",
+    "codex-qmd-sessions-hook": "bin/codex-qmd-sessions-hook",
+    "codex-qmd-sessions-refresh": "bin/codex-qmd-sessions-refresh"
   },
   "scripts": {
     "test": "node --test test/*.test.js",
