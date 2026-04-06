@@ -1,0 +1,27 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-qmd-sessions-hook",
+            "statusMessage": "Loading Codex session context"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "codex-qmd-sessions-hook",
+            "statusMessage": "Syncing Codex session markdown"
+          }
+        ]
+      }
+    ]
+  }
+}

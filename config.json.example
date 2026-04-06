@@ -1,0 +1,14 @@
+{
+  "outputDir": "/absolute/path/to/your/shared/sessions-markdown",
+  "sessionsDir": "~/.codex/sessions",
+  "qmdCollectionName": "sessions",
+  "loadContextOnStartup": true,
+  "maxContextChars": 14000,
+  "maxTurns": 100,
+  "enableEmbed": true,
+  "minSecondsBetweenEmbeds": 45,
+  "includeToolSummaries": false,
+  "assistantHeading": "Codex",
+  "contextFiles": [],
+  "debug": false
+}

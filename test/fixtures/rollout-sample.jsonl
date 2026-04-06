@@ -1,0 +1,14 @@
+{"timestamp":"2026-04-06T18:03:10.000Z","type":"session_meta","payload":{"id":"019ca294-2709-7183-87c9-b0d2f5dbddb0","timestamp":"2026-04-06T18:03:00.000Z","cwd":"/Users/alexander/Development/codex-qmd-sessions-demo","originator":"codex_cli_rs","source":"cli","model_provider":"openai"}}
+{"timestamp":"2026-04-06T18:03:10.100Z","type":"response_item","payload":{"type":"message","role":"user","content":[{"type":"input_text","text":"# AGENTS.md instructions for /Users/alexander/Development/codex-qmd-sessions-demo"}]}}
+{"timestamp":"2026-04-06T18:03:10.200Z","type":"event_msg","payload":{"type":"user_message","message":"Build the standalone Codex converter.","images":[],"local_images":[],"text_elements":[]}}
+{"timestamp":"2026-04-06T18:03:10.300Z","type":"turn_context","payload":{"turn_id":"turn-1","cwd":"/Users/alexander/Development/codex-qmd-sessions-demo","model":"gpt-5.4","approval_policy":"never"}}
+{"timestamp":"2026-04-06T18:03:11.000Z","type":"response_item","payload":{"type":"message","role":"assistant","phase":"commentary","content":[{"type":"output_text","text":"I’m inspecting the rollout structure and qmd behavior first."}]}}
+{"timestamp":"2026-04-06T18:03:11.100Z","type":"response_item","payload":{"type":"function_call","name":"exec_command","arguments":"{\"cmd\":\"pwd\"}","call_id":"call-1"}}
+{"timestamp":"2026-04-06T18:03:11.200Z","type":"response_item","payload":{"type":"function_call_output","call_id":"call-1","output":"ok"}}
+this is not json
+{"timestamp":"2026-04-06T18:03:12.000Z","type":"response_item","payload":{"type":"message","role":"assistant","phase":"commentary","content":[{"type":"output_text","text":"The converter will emit ## User and ## Claude headings for compatibility."}]}}
+{"timestamp":"2026-04-06T18:03:13.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"The first markdown export is ready."}]}}
+{"timestamp":"2026-04-06T18:03:14.000Z","type":"event_msg","payload":{"type":"user_message","message":"Now wire the hooks.","images":[],"local_images":[],"text_elements":[]}}
+{"timestamp":"2026-04-06T18:03:14.100Z","type":"response_item","payload":{"type":"web_search_call","action":{"query":"codex hooks docs"}}}
+{"timestamp":"2026-04-06T18:03:15.000Z","type":"response_item","payload":{"type":"message","role":"assistant","content":[{"type":"output_text","text":"Hooks are wired with SessionStart and Stop."}]}}
+{"timestamp":"2026-04-06T18:03:15.500Z","type":"event_msg","payload":{"type":"token_count","info":"ignored"}}}

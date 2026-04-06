@@ -1,0 +1,53 @@
+{
+  "name": "codex-qmd-sessions",
+  "version": "0.1.0",
+  "description": "Codex-native session exporter for QMD-compatible markdown corpora",
+  "author": "Alexander",
+  "license": "MIT",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alexanderattar/codex-qmd-sessions.git"
+  },
+  "homepage": "https://github.com/alexanderattar/codex-qmd-sessions#readme",
+  "bugs": {
+    "url": "https://github.com/alexanderattar/codex-qmd-sessions/issues"
+  },
+  "keywords": [
+    "codex",
+    "qmd",
+    "obsidian",
+    "hooks",
+    "transcripts"
+  ],
+  "files": [
+    "CHANGELOG.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "LICENSE",
+    "RELEASING.md",
+    "config.json.example",
+    "convert-sessions.js",
+    "doctor.js",
+    "hook.js",
+    "hooks.example.json",
+    "lib.js",
+    "refresh.js"
+  ],
+  "bin": {
+    "codex-qmd-sessions": "./convert-sessions.js",
+    "codex-qmd-sessions-doctor": "./doctor.js",
+    "codex-qmd-sessions-hook": "./hook.js",
+    "codex-qmd-sessions-refresh": "./refresh.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "convert": "node ./convert-sessions.js",
+    "doctor": "node ./doctor.js",
+    "refresh": "node ./refresh.js",
+    "release:check": "npm test && npm pack --dry-run"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

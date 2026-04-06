@@ -1,0 +1,38 @@
+name: Feature request
+description: Suggest a focused improvement to Codex transcript export, restore, or operational tooling.
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What is missing or painful today?
+      placeholder: I need a safer way to test hook wiring without touching my real vault
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Keep this concrete and narrow.
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints or compatibility concerns
+      description: Mention any qmd-sessions compatibility requirements or rollout-schema concerns.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Scope check
+      options:
+        - label: This request does not require redesigning the existing Claude qmd-sessions project
+          required: false
+        - label: This request keeps Codex-specific parsing isolated from Claude-specific code paths
+          required: false

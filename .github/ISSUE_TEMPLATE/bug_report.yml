@@ -1,0 +1,73 @@
+name: Bug report
+description: Report a reproducible problem with transcript conversion, hooks, or QMD integration.
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for parser failures, broken hook behavior, missing notes, restore issues, or QMD refresh problems.
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Short description of the problem.
+      placeholder: Stop hook does not write a markdown file for my active session
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install_mode
+    attributes:
+      label: Install mode
+      options:
+        - Repo clone
+        - Global npm install
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Relevant config
+      description: Paste the relevant config with secrets removed.
+      render: json
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Concrete steps to reproduce the problem.
+      placeholder: |
+        1. Start a new Codex session in repo X
+        2. Send prompt Y
+        3. Stop event fires
+        4. No markdown note appears in outputDir
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostics output
+      description: Paste `codex-qmd-sessions-doctor --json` if possible.
+      render: json
