@@ -9,6 +9,19 @@ The design goal is coexistence, not replacement:
 - Both providers can write into the same markdown corpus.
 - The generated markdown stays close to the existing `qmd-sessions` markdown contract so mixed corpora remain readable and searchable.
 
+## Inspired by claude-qmd-sessions
+
+This project is directly inspired by [wbelk/claude-qmd-sessions](https://github.com/wbelk/claude-qmd-sessions).
+
+That project established the workflow that made this worth building in the first place:
+
+- converting local CLI transcripts into readable markdown
+- keeping those notes inside a QMD-indexed corpus
+- using hooks to keep the markdown and index fresh
+- restoring recent context from the saved session notes
+
+`codex-qmd-sessions` keeps that operating model because it is practical and already proven. The main difference is that Codex transcript storage and hook semantics are different enough that the parser and hook integration needed to be implemented as a separate Codex-specific tool rather than patched into the existing Claude code paths.
+
 ## Architecture
 
 - `convert-sessions.js`: converts one rollout transcript, one session id, or a full `~/.codex/sessions` scan into markdown.
