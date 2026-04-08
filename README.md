@@ -196,10 +196,10 @@ Generated files default to Codex-native headings:
 # Session: Build the standalone converter
 
 **Date:** 2026-04-06
-**Project:** relay-solver
+**Project:** my-project
 **Provider:** Codex
 **Session ID:** 019ca294-2709-7183-87c9-b0d2f5dbddb0
-**Transcript Path:** /Users/alexander/.codex/sessions/2026/04/06/rollout-....jsonl
+**Transcript Path:** /Users/yourname/.codex/sessions/2026/04/06/rollout-....jsonl
 
 ---
 
@@ -240,7 +240,7 @@ Files are written as:
 Example:
 
 ```text
-/vault/sessions/relay-solver/2026-04-06-codex-build-standalone-converter-019ca2942709.md
+/vault/sessions/my-project/2026-04-06-codex-build-standalone-converter-019ca2942709.md
 ```
 
 This keeps Codex files sortable, deterministic, and clearly separated from Claude filenames without forcing a new collection.
