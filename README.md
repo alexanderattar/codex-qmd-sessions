@@ -54,6 +54,19 @@ This project is intentionally small, but it is no longer just a one-off local sc
 
 The main remaining risk is upstream: Codex rollout JSONL is an internal format and can change without notice.
 
+## Quick start
+
+If you want the shortest path from install to a working session export:
+
+1. Clone this repo somewhere outside your main working repos.
+2. Copy `config.json.example` to `config.json` and point `outputDir` at your shared sessions markdown folder.
+3. Enable Codex hooks in `~/.codex/config.toml`.
+4. Copy `hooks.example.json` into `~/.codex/hooks.json` or `<repo>/.codex/hooks.json`.
+5. Run `codex-qmd-sessions-doctor`.
+6. Start a new Codex session and confirm a markdown note appears under your configured `outputDir`.
+
+That is enough to prove the export path is working before you worry about embeddings, shared corpora, or startup restore behavior.
+
 ## Install
 
 You can run this in two supported ways.
