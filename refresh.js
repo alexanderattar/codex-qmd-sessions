@@ -39,7 +39,8 @@ const recentContext = lib.collectRecentTurns(
   config.outputDir,
   cwd,
   config.maxTurns,
-  config.maxContextChars
+  config.maxContextChars,
+  { qmdCollectionName: config.qmdCollectionName }
 );
 
 if (recentContext) {

@@ -199,8 +199,20 @@ function normalizeWhitespace(text) {
   return String(text || "").replace(/\r\n/g, "\n").replace(/\u0000/g, "").trim();
 }
 
+function stripLocalCommandTags(text) {
+  return String(text || "")
+    .replace(/<local-command-caveat>[\s\S]*?<\/local-command-caveat>/g, "")
+    .replace(/<command-name>[\s\S]*?<\/command-name>/g, "")
+    .replace(/<command-message>[\s\S]*?<\/command-message>/g, "")
+    .replace(/<command-args>[\s\S]*?<\/command-args>/g, "")
+    .replace(/<local-command-stdout>[\s\S]*?<\/local-command-stdout>/g, "")
+    .replace(/<local-command-stderr>[\s\S]*?<\/local-command-stderr>/g, "");
+}
+
 function stripSystemTags(text) {
-  return normalizeWhitespace(String(text || "").replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, ""));
+  return normalizeWhitespace(
+    stripLocalCommandTags(String(text || "").replace(/<system-reminder>[\s\S]*?<\/system-reminder>/g, ""))
+  );
 }
 
 function extractTextFromContent(content) {
@@ -698,16 +710,86 @@ function cwdToProject(cwd) {
 
 function extractCompatibleTurnsFromMarkdown(markdown) {
   const sections = String(markdown || "").split(/^(?=## )/m);
-  return sections.filter(function isCompatible(section) {
-    return /^## (User|Claude|Codex|System)/.test(section);
-  });
+  const compatible = [];
+
+  for (const section of sections) {
+    const match = /^(## (User|Claude|Codex|System))\n\n([\s\S]*)$/m.exec(section);
+    if (!match) continue;
+
+    const heading = match[1];
+    const body = stripSystemTags(match[3] || "");
+    if (!body) continue;
+    compatible.push(`${heading}\n\n${body}\n`);
+  }
+
+  return compatible;
 }
 
-function collectRecentTurns(outputDir, cwd, maxTurns, maxChars) {
-  if (!outputDir) return null;
+function qmdExecFile(args, options) {
+  return cp.execFileSync("qmd", args, Object.assign({
+    encoding: "utf8",
+    timeout: 10000,
+  }, options || {}));
+}
 
-  const turnsLimit = Number(maxTurns || DEFAULT_CONFIG.maxTurns);
-  const charsLimit = Number(maxChars || DEFAULT_CONFIG.maxContextChars);
+function parseQmdDocumentUris(output, collectionName) {
+  const matches = String(output || "").match(/qmd:\/\/[^\s)]+\.md\b/g) || [];
+  const allowedPrefix = collectionName ? `qmd://${collectionName}/` : null;
+  const seen = new Set();
+  const uris = [];
+
+  for (const match of matches) {
+    if (allowedPrefix && !match.startsWith(allowedPrefix)) continue;
+    if (seen.has(match)) continue;
+    seen.add(match);
+    uris.push(match);
+  }
+
+  return uris;
+}
+
+function qmdListUris(collectionName, subpath) {
+  if (!collectionName) return [];
+
+  const target = subpath ? `${collectionName}/${subpath}` : collectionName;
+  try {
+    return parseQmdDocumentUris(qmdExecFile(["ls", target]), collectionName);
+  } catch (error) {
+    return [];
+  }
+}
+
+function qmdSearchUris(collectionName, query, limit) {
+  if (!collectionName || !query) return [];
+
+  try {
+    return parseQmdDocumentUris(
+      qmdExecFile([
+        "search",
+        query,
+        "-c",
+        collectionName,
+        "--files",
+        "-n",
+        String(limit || 24),
+      ]),
+      collectionName
+    );
+  } catch (error) {
+    return [];
+  }
+}
+
+function qmdGetDocument(uri) {
+  try {
+    return qmdExecFile(["get", uri], { timeout: 15000 });
+  } catch (error) {
+    return "";
+  }
+}
+
+function collectRecentTurnsFromFiles(outputDir, cwd, turnsLimit, charsLimit) {
+  if (!outputDir) return null;
   const markdownFiles = walkFiles(
     outputDir,
     function matchMarkdown(filePath) {
@@ -719,12 +801,12 @@ function collectRecentTurns(outputDir, cwd, maxTurns, maxChars) {
   if (markdownFiles.length === 0) return null;
 
   const project = cwdToProject(cwd);
-  const projectPrefix = path.join(outputDir, project) + path.sep;
+  const projectPrefix = project ? path.join(outputDir, project) + path.sep : null;
   const currentProject = [];
   const otherProjects = [];
 
   for (const filePath of markdownFiles) {
-    if (filePath.startsWith(projectPrefix)) {
+    if (projectPrefix && filePath.startsWith(projectPrefix)) {
       currentProject.push(filePath);
     } else {
       otherProjects.push(filePath);
@@ -762,6 +844,95 @@ function collectRecentTurns(outputDir, cwd, maxTurns, maxChars) {
 
   const exchanges = Math.floor(collected.length / 2);
   return `[Context restored: ~${exchanges} exchanges from ${sessionsUsed} session${sessionsUsed === 1 ? "" : "s"}]\n\n${collected.join("\n")}`;
+}
+
+function collectRecentTurnsFromQmd(collectionName, cwd, turnsLimit, charsLimit) {
+  if (!collectionName || !qmdAvailable() || !qmdCollectionExists(collectionName)) {
+    return null;
+  }
+
+  const project = cwdToProject(cwd);
+  const candidateUris = [];
+  const seen = new Set();
+
+  function appendUris(uris) {
+    const ordered = uris.slice().sort().reverse();
+    for (const uri of ordered) {
+      if (seen.has(uri)) continue;
+      seen.add(uri);
+      candidateUris.push(uri);
+    }
+  }
+
+  if (project) {
+    appendUris(qmdListUris(collectionName, project));
+  }
+
+  if (candidateUris.length === 0 && project) {
+    appendUris(qmdSearchUris(collectionName, project.replace(/-/g, " "), 24));
+  }
+
+  if (candidateUris.length === 0) {
+    appendUris(qmdListUris(collectionName));
+  }
+
+  if (candidateUris.length === 0) {
+    return null;
+  }
+
+  const collected = [];
+  let totalChars = 0;
+  let sessionsUsed = 0;
+
+  for (const uri of candidateUris) {
+    if (collected.length >= turnsLimit || totalChars >= charsLimit) break;
+
+    const markdown = qmdGetDocument(uri);
+    if (!markdown) continue;
+
+    const fileTurns = extractCompatibleTurnsFromMarkdown(markdown);
+    if (fileTurns.length === 0) continue;
+
+    let added = 0;
+    for (let index = fileTurns.length - 1; index >= 0; index--) {
+      const turn = fileTurns[index];
+      if (collected.length >= turnsLimit) break;
+      if (totalChars + turn.length > charsLimit && collected.length > 0) break;
+      collected.unshift(turn);
+      totalChars += turn.length;
+      added += 1;
+    }
+
+    if (added > 0) {
+      sessionsUsed += 1;
+    }
+  }
+
+  if (collected.length === 0) {
+    return null;
+  }
+
+  const exchanges = Math.floor(collected.length / 2);
+  return `[Context restored via QMD: ~${exchanges} exchanges from ${sessionsUsed} session${sessionsUsed === 1 ? "" : "s"}]\n\n${collected.join("\n")}`;
+}
+
+function collectRecentTurns(outputDir, cwd, maxTurns, maxChars, options) {
+  const turnsLimit = Number(maxTurns || DEFAULT_CONFIG.maxTurns);
+  const charsLimit = Number(maxChars || DEFAULT_CONFIG.maxContextChars);
+  const settings = options && typeof options === "object" ? options : {};
+  const collectionName = settings.qmdCollectionName || DEFAULT_CONFIG.qmdCollectionName;
+
+  const qmdContext = collectRecentTurnsFromQmd(
+    collectionName,
+    cwd,
+    turnsLimit,
+    charsLimit
+  );
+  if (qmdContext) {
+    return qmdContext;
+  }
+
+  return collectRecentTurnsFromFiles(outputDir, cwd, turnsLimit, charsLimit);
 }
 
 function loadContextFiles(contextFiles, cwd) {

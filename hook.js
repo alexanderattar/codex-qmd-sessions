@@ -48,12 +48,10 @@ function handleSessionStart(data, config) {
   const source = data.source;
   const cwd = data.cwd || process.cwd();
   const contextParts = [];
-  const status = [];
 
   const fileContext = lib.loadContextFiles(config.contextFiles, cwd);
   if (fileContext.length > 0) {
     contextParts.push(fileContext.join("\n\n---\n\n"));
-    status.push(`[codex-qmd-sessions] Loaded ${fileContext.length} extra context file${fileContext.length === 1 ? "" : "s"}`);
   }
 
   const shouldLoadRecent = source === "resume" || (source === "startup" && config.loadContextOnStartup);
@@ -62,23 +60,17 @@ function handleSessionStart(data, config) {
       config.outputDir,
       cwd,
       config.maxTurns,
-      config.maxContextChars
+      config.maxContextChars,
+      { qmdCollectionName: config.qmdCollectionName }
     );
     if (recentContext) {
       contextParts.push(recentContext);
-      status.push("[codex-qmd-sessions] Loaded recent indexed session context");
-    } else {
-      status.push("[codex-qmd-sessions] No recent indexed session context found");
     }
   }
 
   const response = {
     continue: true,
   };
-
-  if (status.length > 0) {
-    response.systemMessage = status.join("\n");
-  }
 
   if (contextParts.length > 0) {
     response.hookSpecificOutput = {

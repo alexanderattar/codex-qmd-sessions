@@ -144,7 +144,7 @@ Notes:
 - default config path:
   - repo-local `./config.json` when present
   - otherwise `~/.codex/codex-qmd-sessions/config.json`
-- `qmdCollectionName`: used as a presence guard before `qmd update` / `qmd embed`. Current `qmd update` is global, so this is not a per-collection target flag.
+- `qmdCollectionName`: used both for startup retrieval and as a presence guard before `qmd update` / `qmd embed`. Current `qmd update` is global, so this is not a per-collection target flag.
 - `loadContextOnStartup`: applies to `SessionStart` with `source=startup`. `resume` always attempts to load recent indexed context.
 - `contextFiles`: optional extra files to inject through `additionalContext`. Use this sparingly. Codex already handles `AGENTS.md` natively, so duplicating `AGENTS.md` here is usually a bad idea.
 - `minSecondsBetweenEmbeds`: throttles `qmd update` and `qmd embed` because Codex `Stop` is turn-scoped, not session-scoped.
@@ -251,7 +251,7 @@ This keeps Codex files sortable, deterministic, and clearly separated from Claud
 
 - Matches `startup|resume`.
 - Loads optional `contextFiles`.
-- Loads recent indexed session context from the shared markdown corpus.
+- Loads recent indexed session context from the configured QMD collection, with raw markdown scanning only as a fallback when QMD is unavailable.
 - Returns `hookSpecificOutput.additionalContext` so Codex sees the restored context as extra developer context.
 
 ### Stop
